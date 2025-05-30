@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Сумма времени</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/easymde/dist/easymde.min.css"
+    />
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      textarea {
+        min-height: 380px;
+        width: 100%;
+      }
+      textarea,
+      button {
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 10px;
+        border-radius: 5px;
+        resize: vertical;
+      }
+      button {
+        cursor: pointer;
+        background-color: rgb(0, 174, 255);
+        border: none;
+        color: white;
+      }
+      #result {
+        margin-top: 20px;
+        font-size: 18px;
+      }
+      .container {
+        max-width: 1700px;
+        margin: 0 auto;
+      }
+      .body {
+        max-width: 500px;
+      }
+      .title {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      .buttons {
+        display: flex;
+        gap: 10px;
+      }
+      .button_calculate {
+        flex: 1 1 50%;
+      }
+      .button_telegram {
+        flex: 1 1 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+      }
+      .editor-toolbar button {
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      function onTelegramAuth(user) {
+        alert(
+          'Logged in as ' +
+            user.first_name +
+            ' ' +
+            user.last_name +
+            ' (' +
+            user.id +
+            (user.username ? ', @' + user.username : '') +
+            ')'
+        )
+      }
+    </script>
+    <div>
+      <div class="container">
+        <div class="title">
+          Вставь сюда текст с временем (в формате: 30m, 2h, 1h40m или 1ч 10м):
+        </div>
+        <div class="body">
+          <textarea id="timeInput"></textarea>
+          <br />
+          <div class="buttons">
+            <button onclick="calculateTotalTime()" class="button_calculate">
+              Посчитать
+            </button>
+            <button onclick="sendToTelegram()" class="button_telegram">
+              <div>Отправить</div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28px"
+                height="28px"
+                viewBox="0 0 32 32"
+                fill="none"
+              >
+                <circle
+                  cx="16"
+                  cy="16"
+                  r="14"
+                  fill="url(#paint0_linear_87_7225)"
+                />
+                <path
+                  d="M22.9866 10.2088C23.1112 9.40332 22.3454 8.76755 21.6292 9.082L7.36482 15.3448C6.85123 15.5703 6.8888 16.3483 7.42147 16.5179L10.3631 17.4547C10.9246 17.6335 11.5325 17.541 12.0228 17.2023L18.655 12.6203C18.855 12.4821 19.073 12.7665 18.9021 12.9426L14.1281 17.8646C13.665 18.3421 13.7569 19.1512 14.314 19.5005L19.659 22.8523C20.2585 23.2282 21.0297 22.8506 21.1418 22.1261L22.9866 10.2088Z"
+                  fill="white"
+                />
+                <defs>
+                  <linearGradient
+                    id="paint0_linear_87_7225"
+                    x1="16"
+                    y1="2"
+                    x2="16"
+                    y2="30"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <stop stop-color="#37BBFE" />
+                    <stop offset="1" stop-color="#007DBB" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </button>
+          </div>
+
+          <div id="result"></div>
+
+          <div
+            id="statusMessage"
+            style="margin-top: 15px; font-weight: bold"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const easyMDE = new EasyMDE({
+        element: document.getElementById('timeInput'),
+        spellChecker: false,
+        placeholder: 'Введите текст в формате Markdown...',
+      })
+
+      function normalizeTimeText(text) {
+        return text.replace(/(\d+)\s*ч/gi, '$1h').replace(/(\d+)\s*м/gi, '$1m')
+      }
+
+      function extractTimeStrings(text) {
+        const normalized = normalizeTimeText(text)
+        const matches = [
+          ...normalized.matchAll(
+            /(?:^|[^а-яa-z0-9])(\d+h(?:\s*\d+m)?|\d+m)(?=\s|[.,;!?)]|$)/gi
+          ),
+        ]
+        return matches.map((m) => m[1])
+      }
+
+      function parseTimeString(timeStr) {
+        let hours = 0,
+          minutes = 0
+        const hourMatch = timeStr.match(/(\d+)\s*h/i)
+        const minuteMatch = timeStr.match(/(\d+)\s*m/i)
+        if (hourMatch) hours = parseInt(hourMatch[1], 10)
+        if (minuteMatch) minutes = parseInt(minuteMatch[1], 10)
+        return { hours, minutes }
+      }
+
+      function sumTimes(timeStrings) {
+        let totalMinutes = 0
+        for (const timeStr of timeStrings) {
+          const { hours, minutes } = parseTimeString(timeStr)
+          totalMinutes += hours * 60 + minutes
+        }
+        const finalHours = Math.floor(totalMinutes / 60)
+        const finalMinutes = totalMinutes % 60
+        return `${finalHours}h ${finalMinutes}m`
+      }
+
+      function calculateTotalTime() {
+        const inputText = easyMDE.value()
+        const timeEntries = extractTimeStrings(inputText)
+        const total = sumTimes(timeEntries)
+        document.getElementById(
+          'result'
+        ).textContent = `Суммарное время: ${total}`
+      }
+
+      // Ctrl+Enter в EasyMDE для подсчёта
+      easyMDE.codemirror.addKeyMap({
+        'Ctrl-Enter': function (cm) {
+          calculateTotalTime()
+        },
+      })
+
+      function sendToTelegram() {
+        const markdownText = easyMDE.value()
+
+        // Преобразование Markdown → Telegram HTML
+        const htmlText = markdownText
+          .replace(/^-\s*/gm, '– ') // маркеры списков
+          .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // жирный текст
+          .replace(/__(.*?)__/g, '<u>$1</u>') // подчёркнутый
+          .replace(/\r\n/g, '\n') // переносы
+          .replace(/\n{3,}/g, '\n\n') // не больше 2-х подряд
+          .trim()
+
+        const statusDiv = document.getElementById('statusMessage')
+        statusDiv.textContent = '⏳ Отправка...'
+        statusDiv.style.color = 'orange'
+
+        fetch('https://calculator-time-backend.onrender.com/send-to-telegram', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: htmlText,
+            parse_mode: 'HTML', // <== ВАЖНО
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error('Ошибка при отправке')
+            return response.json()
+          })
+          .then(() => {
+            statusDiv.textContent = '✅ Сообщение отправлено в Telegram!'
+            statusDiv.style.color = 'green'
+            console.log(htmlText)
+          })
+          .catch(() => {
+            statusDiv.textContent = '❌ Ошибка при отправке в Telegram.'
+            statusDiv.style.color = 'red'
+            console.log(htmlText)
+          })
+      }
+
+      // Сохраняем текст из EasyMDE в localStorage
+      easyMDE.codemirror.on('change', () => {
+        localStorage.setItem('timeInputText', easyMDE.value())
+      })
+
+      // Загружаем сохранённый текст из localStorage при загрузке страницы
+      window.addEventListener('DOMContentLoaded', () => {
+        const savedText = localStorage.getItem('timeInputText')
+        if (savedText) {
+          easyMDE.value(savedText)
+        }
+      })
+    </script>
+  </body>
+</html>
