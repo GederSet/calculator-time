@@ -2,7 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <title>Сумма времени</title>
+    <title>Трекинг времени</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/easymde/dist/easymde.min.css"
@@ -10,64 +10,307 @@
     <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-      * {
-        box-sizing: border-box;
+      :root {
+        --bg-main: #ececf1;
+        --container-bg: #fff;
+        --calculate-bg: #ececf1;
+        --calculate-bg-hover: #e0e0e6;
+        --text-main: #343541;
+        --subtext: #6e6e80;
+        --input-bg: #fff;
+        --project-border: #d9d9e3;
+        --primary: #10a37f;
+        --primary-hover: #0d8a6a;
+        --danger: #ff4d4f;
+        --danger-hover: #d9363e;
+        --input-border: #f7f7fa;
+        --bubble-bg: #f7f7fa;
+        --shadow: 0 4px 32px rgb(35 35 35 / 10%);
       }
       body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: var(--bg-main);
+        color: var(--text-main);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-weight: 400;
+      }
+      .container {
+        width: 100%;
+        max-width: 540px;
+        margin: 40px auto 40px auto;
+        background: var(--container-bg);
+        border-radius: 16px;
+        padding: 0 0 16px 0;
+        box-shadow: var(--shadow);
         display: flex;
         flex-direction: column;
       }
-      textarea {
-        min-height: 380px;
-        width: 100%;
+      .title {
+        margin: 0;
+        padding: 32px 32px 0 32px;
+        margin-bottom: 20px;
+        font-size: 2rem;
+        color: var(--text-main);
+        letter-spacing: -1px;
       }
-      textarea,
-      button {
+      .sub-title {
+        color: var(--text-main);
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+      form {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0 32px;
+      }
+      .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+      .project-input {
         padding: 10px;
-        font-size: 16px;
-        margin-top: 10px;
-        border-radius: 5px;
-        resize: vertical;
       }
-      button {
-        cursor: pointer;
-        background-color: rgb(0, 174, 255);
-        border: none;
+      .form-row input,
+      .form-row textarea {
+        padding: 10px 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text-main);
+        transition: background 0.2s, border 0.2s;
+      }
+      .form-row input:focus,
+      .form-row textarea:focus,
+      .project-fields input:focus,
+      .project-fields textarea:focus {
+        border: 1.5px solid var(--primary);
+        outline: none;
+        background: #fff;
+      }
+      .projects-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 10px;
+      }
+      .project {
+        background: var(--bubble-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 16px;
+        padding: 16px 18px 20px 18px;
+        margin-bottom: 20px;
+        position: relative;
+      }
+      .project-fields label {
+        display: flex;
+        flex-direction: column;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--subtext);
+        margin-bottom: 2px;
+      }
+      .project-label {
+        font-size: 18px;
+        font-weight: 400;
+        color: var(--text-main);
+        margin-bottom: 10px;
+      }
+      .project-fields input {
+        padding: 12px;
+        font-size: 15px;
+        border-radius: 6px;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text-main);
+        margin-bottom: 2px;
+        transition: border 0.2s;
+      }
+      .project textarea {
+        outline: none;
+        min-height: 60px;
+        resize: vertical;
+        padding: 12px;
+        font-size: 15px;
+        border-radius: 6px;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        color: var(--text-main);
+        margin-bottom: 10px;
+        transition: border 0.2s;
+      }
+      .remove-project-btn {
+        background: var(--danger);
         color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 0;
+        margin-bottom: 0;
+        text-align: right;
+        transition: background 0.2s;
+      }
+      .remove-project-btn:hover {
+        background: var(--danger-hover);
+      }
+      .add-project-btn,
+      .calculate-btn,
+      .send-btn {
+        width: 100%;
+        min-width: 120px;
+        padding: 10px 18px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        transition: background 0.2s, color 0.2s;
+      }
+      .add-project-btn {
+        background: var(--primary);
+        color: #fff;
+      }
+      .add-project-btn:hover {
+        background: var(--primary-hover);
+      }
+      .calculate-btn {
+        background: var(--calculate-bg);
+        color: var(--text-main);
+        border: 1px solid var(--input-border);
+      }
+      .calculate-btn:hover {
+        background: var(--calculate-bg-hover);
+      }
+      .send-btn {
+        background: var(--primary);
+        color: #fff;
+      }
+      .send-btn:hover {
+        background: var(--primary-hover);
       }
       #result {
-        margin-top: 20px;
+        margin: 16px 0 0 0;
         font-size: 18px;
+        padding-top: 12px;
+        color: var(--text-main);
+        max-width: 80%;
+        align-self: flex-start;
+        margin-left: 0;
       }
-      .container {
-        max-width: 1700px;
-        margin: 0 auto;
-      }
-      .body {
-        max-width: 500px;
-      }
-      .title {
-        font-size: 24px;
-        margin-bottom: 20px;
-      }
-      .buttons {
-        display: flex;
-        gap: 10px;
-      }
-      .button_calculate {
-        flex: 1 1 50%;
-      }
-      .button_telegram {
-        flex: 1 1 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
+      #statusMessage {
+        margin-top: 15px;
+        font-weight: 500;
+        color: var(--primary);
+        font-size: 15px;
+        padding-left: 2px;
       }
       .editor-toolbar button {
-        color: black;
+        color: var(--text-main);
+      }
+      @media (max-width: 600px) {
+        .container {
+          max-width: 100vw;
+          border-radius: 0;
+          box-shadow: none;
+        }
+        form {
+          padding: 0 8px;
+        }
+        h2 {
+          padding: 24px 8px 0 8px;
+        }
+        #result {
+          max-width: 98%;
+        }
+      }
+      /* Тёмная тема */
+      body.dark-theme {
+        --bg-main: #181a20;
+        --container-bg: #23262f;
+        --calculate-bg: #23262f;
+        --calculate-bg-hover: #17191f;
+        --text-main: #f7f7fa;
+        --subtext: #bdbdbd;
+        --input-bg: #23262f;
+        --input-border: #393b41;
+        --primary: #10a37f;
+        --primary-hover: #0d8a6a;
+        --danger: #ff4d4f;
+        --danger-hover: #d9363e;
+        --input-border: #393b41;
+        --bubble-bg: #23262f;
+        --shadow: 0 4px 32px rgb(0 0 0 / 40%);
+      }
+      @media (prefers-color-scheme: dark) {
+        body:not(.light-theme) {
+          --bg-main: #181a20;
+          --container-bg: #23262f;
+          --calculate-bg: #23262f;
+          --calculate-bg-hover: #17191f;
+          --text-main: #f7f7fa;
+          --subtext: #bdbdbd;
+          --input-bg: #23262f;
+          --input-border: #393b41;
+          --primary: #10a37f;
+          --primary-hover: #0d8a6a;
+          --danger: #ff4d4f;
+          --danger-hover: #d9363e;
+          --input-border: #393b41;
+          --bubble-bg: #23262f;
+          --shadow: 0 4px 32px rgb(0 0 0 / 40%);
+        }
+      }
+      body.dark-theme .form-row input,
+      body.dark-theme .form-row textarea,
+      body.dark-theme .project .project-fields input,
+      body.dark-theme .project textarea {
+        background: var(--input-bg);
+      }
+      body.dark-theme .form-row input:focus,
+      body.dark-theme .form-row textarea:focus,
+      body.dark-theme .project .project-fields input:focus,
+      body.dark-theme .project textarea:focus {
+        background: var(--container-bg);
+      }
+      body.dark-theme input[type='date'] {
+        background: var(--input-bg);
+      }
+      body.dark-theme input[type='date']:focus {
+        background: var(--container-bg);
+      }
+      .theme-toggle-btn {
+        position: absolute;
+        top: 18px;
+        right: 24px;
+        z-index: 10;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        font-size: 22px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+      }
+      .theme-toggle-btn:hover {
+        background: var(--input-bg);
       }
     </style>
   </head>
@@ -85,174 +328,374 @@
             ')'
         )
       }
+      // Тема: переключение и сохранение
+      function setTheme(theme) {
+        document.body.classList.remove('dark-theme', 'light-theme')
+        if (theme === 'dark') {
+          document.body.classList.add('dark-theme')
+        } else if (theme === 'light') {
+          document.body.classList.add('light-theme')
+        }
+        localStorage.setItem('theme', theme)
+      }
+      function toggleTheme() {
+        const current = document.body.classList.contains('dark-theme')
+          ? 'dark'
+          : 'light'
+        setTheme(current === 'dark' ? 'light' : 'dark')
+        updateThemeIcon()
+      }
+      function updateThemeIcon() {
+        const btn = document.getElementById('themeToggleBtn')
+        if (document.body.classList.contains('dark-theme')) {
+          btn.innerHTML = '🌙'
+        } else {
+          btn.innerHTML = '☀️'
+        }
+
+        // Обновляем цвет успешных уведомлений при смене темы
+        const statusTelegram = document.getElementById('statusTelegram')
+        if (statusTelegram && statusTelegram.textContent.includes('✅')) {
+          statusTelegram.style.color = getSuccessColor()
+        }
+        const statusGoogle = document.getElementById('statusGoogle')
+        if (statusGoogle && statusGoogle.textContent.includes('✅')) {
+          statusGoogle.style.color = getSuccessColor()
+        }
+      }
+      document.addEventListener('DOMContentLoaded', function () {
+        // Восстановление темы
+        const savedTheme = localStorage.getItem('theme')
+        if (savedTheme) setTheme(savedTheme)
+        else if (
+          window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+        )
+          setTheme('dark')
+        updateThemeIcon()
+      })
     </script>
-    <div>
-      <div class="container">
-        <div class="title">
-          Вставь сюда текст с временем (в формате: 30m, 2h, 1h40m или 1ч 10м):
+    <div class="container" style="position: relative">
+      <button
+        id="themeToggleBtn"
+        class="theme-toggle-btn"
+        type="button"
+        onclick="toggleTheme()"
+      >
+        ☀️
+      </button>
+      <h2 class="title">Трекинг времени</h2>
+      <form id="timeForm" autocomplete="off" onsubmit="return false;">
+        <div class="form-row">
+          <label class="sub-title" for="userName">Имя и фамилия:</label>
+          <input type="text" id="userName" required placeholder="Иван Иванов" />
         </div>
-        <div class="body">
-          <textarea id="timeInput"></textarea>
-          <br />
-          <div class="buttons">
-            <button onclick="calculateTotalTime()" class="button_calculate">
-              Посчитать
-            </button>
-            <button onclick="sendToTelegram()" class="button_telegram">
-              <div>Отправить</div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="28px"
-                height="28px"
-                viewBox="0 0 32 32"
-                fill="none"
-              >
-                <circle
-                  cx="16"
-                  cy="16"
-                  r="14"
-                  fill="url(#paint0_linear_87_7225)"
-                />
-                <path
-                  d="M22.9866 10.2088C23.1112 9.40332 22.3454 8.76755 21.6292 9.082L7.36482 15.3448C6.85123 15.5703 6.8888 16.3483 7.42147 16.5179L10.3631 17.4547C10.9246 17.6335 11.5325 17.541 12.0228 17.2023L18.655 12.6203C18.855 12.4821 19.073 12.7665 18.9021 12.9426L14.1281 17.8646C13.665 18.3421 13.7569 19.1512 14.314 19.5005L19.659 22.8523C20.2585 23.2282 21.0297 22.8506 21.1418 22.1261L22.9866 10.2088Z"
-                  fill="white"
-                />
-                <defs>
-                  <linearGradient
-                    id="paint0_linear_87_7225"
-                    x1="16"
-                    y1="2"
-                    x2="16"
-                    y2="30"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stop-color="#37BBFE" />
-                    <stop offset="1" stop-color="#007DBB" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </button>
-          </div>
-
-          <div id="result"></div>
-
-          <div
-            id="statusMessage"
-            style="margin-top: 15px; font-weight: bold"
-          ></div>
+        <div class="form-row">
+          <label class="sub-title" for="workDate">Дата:</label>
+          <input type="date" id="workDate" required />
         </div>
-      </div>
+        <div class="sub-title" style="margin-bottom: 10px; font-size: 18px">
+          Проекты:
+        </div>
+        <div id="projectsList" class="projects-list"></div>
+        <button type="button" class="add-project-btn" onclick="addProject()">
+          Добавить проект
+        </button>
+        <div style="margin-top: 20px; display: flex; gap: 10px">
+          <button type="button" class="send-btn" onclick="sendData()">
+            Отправить
+          </button>
+          <button
+            type="button"
+            class="calculate-btn"
+            onclick="calculateTotalTime()"
+          >
+            Посчитать
+          </button>
+        </div>
+        <div id="result"></div>
+        <div id="statusMessage"></div>
+      </form>
     </div>
 
     <script>
-      const easyMDE = new EasyMDE({
-        element: document.getElementById('timeInput'),
-        spellChecker: false,
-        placeholder: 'Введите текст в формате Markdown...',
-      })
+      let projects = []
+      let projectId = 0
 
-      function normalizeTimeText(text) {
-        return text.replace(/(\d+)\s*ч/gi, '$1h').replace(/(\d+)\s*м/gi, '$1m')
+      function addProject() {
+        const id = ++projectId
+        projects.push({ id, name: '', time: '', comment: '' })
+        renderProjects()
+      }
+      window.addProject = addProject
+
+      function removeProject(id) {
+        if (confirm('Точно удалить этот проект?')) {
+          projects = projects.filter((p) => p.id !== id)
+          renderProjects()
+        }
+      }
+      window.removeProject = removeProject
+
+      function updateProjectField(id, field, value) {
+        const proj = projects.find((p) => p.id === id)
+        if (proj) {
+          proj[field] = value
+        }
+      }
+      window.updateProjectField = updateProjectField
+
+      function renderProjects() {
+        const list = document.getElementById('projectsList')
+        list.innerHTML = ''
+        projects.forEach((proj) => {
+          const div = document.createElement('div')
+          div.className = 'project'
+          div.innerHTML = `
+            <div class="project-fields">
+              <label>
+                <p class="project-label">Название проекта</p>
+                <input name="project-name" type="text" placeholder="Название проекта" value="${proj.name.replace(
+                  /"/g,
+                  '&quot;'
+                )}" onchange="updateProjectField(${
+            proj.id
+          }, 'name', this.value)" required />
+              </label>
+              <label>
+                <p class="project-label">Время (например, 1h 40m)</p>
+                <input name="project-time" type="text" placeholder="Время" value="${proj.time.replace(
+                  /"/g,
+                  '&quot;'
+                )}" onchange="updateProjectField(${
+            proj.id
+          }, 'time', this.value)" required />
+              </label>
+              <label>
+                <p class="project-label">Что было выполнено</p>
+                <textarea placeholder="Что было выполнено" onchange="updateProjectField(${
+                  proj.id
+                }, 'comment', this.value)">${proj.comment.replace(
+            /</g,
+            '&lt;'
+          )}</textarea>
+              </label>
+            </div>
+            <button type="button" class="remove-project-btn" onclick="removeProject(${
+              proj.id
+            })">Удалить</button>
+          `
+          list.appendChild(div)
+        })
       }
 
-      function extractTimeStrings(text) {
-        const normalized = normalizeTimeText(text)
-        const matches = [
-          ...normalized.matchAll(
-            /(?:^|[^а-яa-z0-9])(\d+h(?:\s*\d+m)?|\d+m)(?=\s|[.,;!?)]|$)/gi
-          ),
-        ]
-        return matches.map((m) => m[1])
+      function calculateTotalTime() {
+        let totalMinutes = 0
+        let hasTime = false
+        for (const proj of projects) {
+          if (proj.time && proj.time.trim()) {
+            const { hours, minutes } = parseTimeString(proj.time)
+            totalMinutes += hours * 60 + minutes
+            hasTime = true
+          }
+        }
+        let finalHours = 0,
+          finalMinutes = 0
+        if (hasTime) {
+          finalHours = Math.floor(totalMinutes / 60)
+          finalMinutes = totalMinutes % 60
+        }
+        document.getElementById('result').textContent =
+          'Суммарное время: ' + finalHours + 'h ' + finalMinutes + 'm'
+      }
+
+      function sendData() {
+        const name = document.getElementById('userName').value.trim()
+        const date = document.getElementById('workDate').value
+        if (!name || !date || projects.length === 0) {
+          alert(
+            'Пожалуйста, заполните все поля и добавьте хотя бы один проект.'
+          )
+          return
+        }
+        for (const proj of projects) {
+          if (!proj.name || !proj.time || !proj.comment) {
+            alert('Пожалуйста, заполните все поля у каждого проекта.')
+            return
+          }
+        }
+        // Формируем сообщение для Telegram
+        const dateParts = date.split('-')
+        const formattedDate =
+          dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}` : date
+        let message = `${formattedDate} ${name.split(' ')[0]}`
+
+        projects.forEach((proj) => {
+          const { hours, minutes } = parseTimeString(proj.time)
+          let timeStr = ''
+          if (hours) timeStr += hours + 'h '
+          if (minutes) timeStr += minutes + 'm'
+          timeStr = timeStr.trim()
+          message += `\n\n${timeStr} - ${proj.name}\n${proj.comment}`
+        })
+
+        // Отправка в Telegram
+        let statusTelegram = document.getElementById('statusTelegram')
+        let statusGoogle = document.getElementById('statusGoogle')
+        if (!statusTelegram) {
+          statusTelegram = document.createElement('div')
+          statusTelegram.id = 'statusTelegram'
+          statusTelegram.style.marginTop = '15px'
+          statusTelegram.style.fontWeight = '500'
+          statusTelegram.style.fontSize = '15px'
+          statusTelegram.style.display = 'flex'
+          statusTelegram.style.alignItems = 'center'
+          document
+            .getElementById('statusMessage')
+            .parentNode.insertBefore(
+              statusTelegram,
+              document.getElementById('statusMessage')
+            )
+        }
+        if (!statusGoogle) {
+          statusGoogle = document.createElement('div')
+          statusGoogle.id = 'statusGoogle'
+          statusGoogle.style.fontWeight = '500'
+          statusGoogle.style.fontSize = '15px'
+          statusGoogle.style.display = 'flex'
+          statusGoogle.style.alignItems = 'center'
+          document
+            .getElementById('statusMessage')
+            .parentNode.insertBefore(
+              statusGoogle,
+              document.getElementById('statusMessage')
+            )
+        }
+        statusTelegram.textContent = '⏳ Отправка в Telegram...'
+        statusTelegram.style.color = 'orange'
+        statusGoogle.textContent = ''
+        fetch('https://calculator-time-backend.onrender.com/send-to-telegram', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, parse_mode: 'HTML' }),
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error('Ошибка при отправке в Telegram')
+            return response.json()
+          })
+          .then(() => {
+            statusTelegram.textContent = '✅ Сообщение отправлено в Telegram!'
+            statusTelegram.style.color = getSuccessColor()
+          })
+          .catch(() => {
+            statusTelegram.textContent = '❌ Ошибка при отправке в Telegram.'
+            statusTelegram.style.color = 'red'
+          })
+        // Отправка в Google Таблицу (через n8n webhook)
+        statusGoogle.textContent = '⏳ Отправка в Google Таблицу...'
+        statusGoogle.style.color = 'orange'
+        let googleErrors = 0
+        let googleSent = 0
+        projects.forEach((proj) => {
+          const { hours, minutes } = parseTimeString(proj.time)
+          let totalMinutes = hours * 60 + minutes
+          if (!isFinite(totalMinutes) || totalMinutes <= 0) totalMinutes = ''
+          // Форматируем дату в dd.mm.yyyy
+          let formattedDate = date
+          if (date && date.includes('-')) {
+            const dateParts = date.split('-')
+            if (dateParts.length === 3) {
+              formattedDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
+            }
+          }
+          const data = {
+            employee: name,
+            project: proj.name,
+            date: formattedDate,
+            time: totalMinutes ? String(totalMinutes) : '',
+            comment: proj.comment,
+          }
+          fetch(
+            'https://n8n-8018645861-7.nocodecloud.ru/webhook/timetracking',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+            }
+          )
+            .then((response) => {
+              if (!response.ok) googleErrors++
+              else googleSent++
+              if (googleSent + googleErrors === projects.length) {
+                if (googleErrors === 0) {
+                  statusGoogle.textContent =
+                    '✅ Данные отправлены в Google Таблицу!'
+                  statusGoogle.style.color = getSuccessColor()
+                } else {
+                  statusGoogle.textContent = `❌ Ошибка при отправке в Google Таблицу (${googleErrors} из ${projects.length})`
+                  statusGoogle.style.color = 'red'
+                }
+              }
+            })
+            .catch(() => {
+              googleErrors++
+              if (googleSent + googleErrors === projects.length) {
+                statusGoogle.textContent = `❌ Ошибка при отправке в Google Таблицу (${googleErrors} из ${projects.length})`
+                statusGoogle.style.color = 'red'
+              }
+            })
+        })
       }
 
       function parseTimeString(timeStr) {
         let hours = 0,
           minutes = 0
-        const hourMatch = timeStr.match(/(\d+)\s*h/i)
-        const minuteMatch = timeStr.match(/(\d+)\s*m/i)
+        if (!timeStr) return { hours, minutes }
+        // Поддержка 1h 40m, 1ч 40м, 30m, 2h, 1ч, 40м
+        const norm = timeStr
+          .replace(/(\d+)\s*ч/gi, '$1h')
+          .replace(/(\d+)\s*м/gi, '$1m')
+        const hourMatch = norm.match(/(\d+)\s*h/i)
+        const minuteMatch = norm.match(/(\d+)\s*m/i)
         if (hourMatch) hours = parseInt(hourMatch[1], 10)
         if (minuteMatch) minutes = parseInt(minuteMatch[1], 10)
         return { hours, minutes }
       }
 
-      function sumTimes(timeStrings) {
-        let totalMinutes = 0
-        for (const timeStr of timeStrings) {
-          const { hours, minutes } = parseTimeString(timeStr)
-          totalMinutes += hours * 60 + minutes
-        }
-        const finalHours = Math.floor(totalMinutes / 60)
-        const finalMinutes = totalMinutes % 60
-        return `${finalHours}h ${finalMinutes}m`
+      // Функция для выбора цвета успеха в зависимости от темы
+      function getSuccessColor() {
+        return document.body.classList.contains('dark-theme')
+          ? 'rgb(18 188 18)'
+          : 'green'
       }
 
-      function calculateTotalTime() {
-        const inputText = easyMDE.value()
-        const timeEntries = extractTimeStrings(inputText)
-        const total = sumTimes(timeEntries)
-        document.getElementById(
-          'result'
-        ).textContent = `Суммарное время: ${total}`
+      // Автосохранение имени и даты
+      function saveUserFieldsToLocalStorage() {
+        localStorage.setItem(
+          'userName',
+          document.getElementById('userName').value
+        )
+        localStorage.setItem(
+          'workDate',
+          document.getElementById('workDate').value
+        )
       }
-
-      // Ctrl+Enter в EasyMDE для подсчёта
-      easyMDE.codemirror.addKeyMap({
-        'Ctrl-Enter': function (cm) {
-          calculateTotalTime()
-        },
+      document.addEventListener('DOMContentLoaded', function () {
+        const nameInput = document.getElementById('userName')
+        const dateInput = document.getElementById('workDate')
+        // Восстановление
+        const savedName = localStorage.getItem('userName')
+        const savedDate = localStorage.getItem('workDate')
+        if (savedName) nameInput.value = savedName
+        if (savedDate) dateInput.value = savedDate
+        // Слушатели для автосохранения
+        nameInput.addEventListener('input', saveUserFieldsToLocalStorage)
+        dateInput.addEventListener('input', saveUserFieldsToLocalStorage)
       })
 
-      function sendToTelegram() {
-        const markdownText = easyMDE.value()
-
-        // Преобразование Markdown → Telegram HTML
-        const htmlText = markdownText
-          .replace(/^-\s*/gm, '– ') // маркеры списков
-          .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // жирный текст
-          .replace(/__(.*?)__/g, '<u>$1</u>') // подчёркнутый
-          .replace(/\r\n/g, '\n') // переносы
-          .replace(/\n{3,}/g, '\n\n') // не больше 2-х подряд
-          .trim()
-
-        const statusDiv = document.getElementById('statusMessage')
-        statusDiv.textContent = '⏳ Отправка...'
-        statusDiv.style.color = 'orange'
-
-        fetch('https://calculator-time-backend.onrender.com/send-to-telegram', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: htmlText,
-            parse_mode: 'HTML', // <== ВАЖНО
-          }),
-        })
-          .then((response) => {
-            if (!response.ok) throw new Error('Ошибка при отправке')
-            return response.json()
-          })
-          .then(() => {
-            statusDiv.textContent = '✅ Сообщение отправлено в Telegram!'
-            statusDiv.style.color = 'green'
-            console.log(htmlText)
-          })
-          .catch(() => {
-            statusDiv.textContent = '❌ Ошибка при отправке в Telegram.'
-            statusDiv.style.color = 'red'
-            console.log(htmlText)
-          })
-      }
-
-      // Сохраняем текст из EasyMDE в localStorage
-      easyMDE.codemirror.on('change', () => {
-        localStorage.setItem('timeInputText', easyMDE.value())
-      })
-
-      // Загружаем сохранённый текст из localStorage при загрузке страницы
+      // Инициализация: добавляем первый проект по умолчанию
       window.addEventListener('DOMContentLoaded', () => {
-        const savedText = localStorage.getItem('timeInputText')
-        if (savedText) {
-          easyMDE.value(savedText)
-        }
+        if (projects.length === 0) addProject()
       })
     </script>
   </body>
