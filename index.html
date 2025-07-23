@@ -574,11 +574,14 @@
         statusTelegram.textContent = '⏳ Отправка в Telegram...'
         statusTelegram.style.color = 'orange'
         statusGoogle.textContent = ''
-        fetch('https://calculator-time-backend.onrender.com/send-to-telegram', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message, parse_mode: 'HTML' }),
-        })
+        fetch(
+          'https://n8n-8018645861-7.nocodecloud.ru/webhook/send-to-telegram',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message }),
+          }
+        )
           .then((response) => {
             if (!response.ok) throw new Error('Ошибка при отправке в Telegram')
             return response.json()
@@ -586,6 +589,24 @@
           .then(() => {
             statusTelegram.textContent = '✅ Сообщение отправлено в Telegram!'
             statusTelegram.style.color = getSuccessColor()
+
+            // Если сегодня пятница и мы отправили отчет за другой день,
+            // меняем дату на сегодняшнюю и очищаем проекты, чтобы
+            // можно было сразу затрекать пятницу.
+            const today = new Date()
+            if (today.getDay() === 5) {
+              // 5 = Пятница
+              const dateInput = document.getElementById('workDate')
+              const todayFormatted = today.toISOString().split('T')[0]
+
+              if (dateInput.value !== todayFormatted) {
+                dateInput.value = todayFormatted
+                projects = []
+                addProject() // Очищает и рендерит новый проект
+                document.getElementById('result').textContent =
+                  'Отчет за вчера отправлен. Теперь можно заполнить за пятницу.'
+              }
+            }
           })
           .catch(() => {
             statusTelegram.textContent = '❌ Ошибка при отправке в Telegram.'
@@ -669,28 +690,27 @@
           : 'green'
       }
 
-      // Автосохранение имени и даты
-      function saveUserFieldsToLocalStorage() {
+      // Автосохранение имени
+      function saveUserNameToLocalStorage() {
         localStorage.setItem(
           'userName',
           document.getElementById('userName').value
-        )
-        localStorage.setItem(
-          'workDate',
-          document.getElementById('workDate').value
         )
       }
       document.addEventListener('DOMContentLoaded', function () {
         const nameInput = document.getElementById('userName')
         const dateInput = document.getElementById('workDate')
-        // Восстановление
+        // Восстановление имени
         const savedName = localStorage.getItem('userName')
-        const savedDate = localStorage.getItem('workDate')
         if (savedName) nameInput.value = savedName
-        if (savedDate) dateInput.value = savedDate
+
+        // Установка вчерашней даты
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        dateInput.value = yesterday.toISOString().split('T')[0]
+
         // Слушатели для автосохранения
-        nameInput.addEventListener('input', saveUserFieldsToLocalStorage)
-        dateInput.addEventListener('input', saveUserFieldsToLocalStorage)
+        nameInput.addEventListener('input', saveUserNameToLocalStorage)
       })
 
       // Инициализация: добавляем первый проект по умолчанию
