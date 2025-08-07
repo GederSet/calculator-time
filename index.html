@@ -426,6 +426,8 @@
         const id = ++projectId
         projects.push({ id, name: '', time: '', comment: '' })
         renderProjects()
+        // Обновляем плейсхолдеры после добавления проекта
+        updateTimePlaceholders()
       }
       window.addProject = addProject
 
@@ -433,6 +435,8 @@
         if (confirm('Точно удалить этот проект?')) {
           projects = projects.filter((p) => p.id !== id)
           renderProjects()
+          // Обновляем плейсхолдеры после удаления проекта
+          updateTimePlaceholders()
         }
       }
       window.removeProject = removeProject
@@ -444,6 +448,62 @@
         }
       }
       window.updateProjectField = updateProjectField
+
+      // Функция для расчета общего времени всех проектов
+      function calculateTotalUsedTime() {
+        let totalMinutes = 0
+        for (const proj of projects) {
+          if (proj.time && proj.time.trim()) {
+            const { hours, minutes } = parseTimeString(proj.time)
+            totalMinutes += hours * 60 + minutes
+          }
+        }
+        return totalMinutes
+      }
+
+      // Функция для расчета оставшегося времени
+      function calculateRemainingTime() {
+        const totalUsedMinutes = calculateTotalUsedTime()
+        const workDayMinutes = 8 * 60 // 8 часов в минутах
+        const remainingMinutes = workDayMinutes - totalUsedMinutes
+        return Math.max(0, remainingMinutes) // Не меньше 0
+      }
+
+      // Функция для форматирования времени в читаемый вид
+      function formatTimeFromMinutes(minutes) {
+        if (minutes <= 0) return '0ч 0м'
+        const hours = Math.floor(minutes / 60)
+        const remainingMinutes = minutes % 60
+        let result = ''
+        if (hours > 0) result += hours + 'ч '
+        if (remainingMinutes > 0 || hours === 0)
+          result += remainingMinutes + 'м'
+        return result.trim()
+      }
+
+      // Функция для обновления плейсхолдеров времени
+      function updateTimePlaceholders() {
+        const timeInputs = document.querySelectorAll(
+          'input[name="project-time"]'
+        )
+        timeInputs.forEach((input, index) => {
+          const currentProject = projects[index]
+          if (currentProject) {
+            // Временно сохраняем текущее значение
+            const currentValue = currentProject.time
+
+            // Временно обнуляем время текущего проекта для расчета оставшегося
+            currentProject.time = ''
+            const remainingTime = calculateRemainingTime()
+
+            // Восстанавливаем значение
+            currentProject.time = currentValue
+
+            // Обновляем плейсхолдер
+            input.placeholder = `${formatTimeFromMinutes(remainingTime)}`
+          }
+        })
+      }
 
       function renderProjects() {
         const list = document.getElementById('projectsList')
@@ -463,13 +523,13 @@
           }, 'name', this.value)" required />
               </label>
               <label>
-                <p class="project-label">Время (например, 1h 40m)</p>
+                <p class="project-label">Время (например, 1ч 40м)</p>
                 <input name="project-time" type="text" placeholder="Время" value="${proj.time.replace(
                   /"/g,
                   '&quot;'
-                )}" onchange="updateProjectField(${
+                )}" oninput="updateProjectField(${
             proj.id
-          }, 'time', this.value)" required />
+          }, 'time', this.value); updateTimePlaceholders()" required />
               </label>
               <label>
                 <p class="project-label">Что было выполнено</p>
@@ -487,6 +547,8 @@
           `
           list.appendChild(div)
         })
+        // Обновляем плейсхолдеры после рендеринга
+        updateTimePlaceholders()
       }
 
       function calculateTotalTime() {
@@ -506,7 +568,7 @@
           finalMinutes = totalMinutes % 60
         }
         document.getElementById('result').textContent =
-          'Суммарное время: ' + finalHours + 'h ' + finalMinutes + 'm'
+          'Суммарное время: ' + finalHours + 'ч ' + finalMinutes + 'м'
       }
 
       function sendData() {
@@ -533,8 +595,8 @@
         projects.forEach((proj) => {
           const { hours, minutes } = parseTimeString(proj.time)
           let timeStr = ''
-          if (hours) timeStr += hours + 'h '
-          if (minutes) timeStr += minutes + 'm'
+          if (hours) timeStr += hours + 'ч '
+          if (minutes) timeStr += minutes + 'м'
           timeStr = timeStr.trim()
           message += `\n\n${timeStr} - ${proj.name}\n${proj.comment}`
         })
@@ -593,18 +655,20 @@
             // Если сегодня пятница и мы отправили отчет за другой день,
             // меняем дату на сегодняшнюю и очищаем проекты, чтобы
             // можно было сразу затрекать пятницу.
-            const today = new Date()
-            if (today.getDay() === 5) {
-              // 5 = Пятница
+            if (isFridayToday()) {
               const dateInput = document.getElementById('workDate')
-              const todayFormatted = today.toISOString().split('T')[0]
+              const todayFormatted = getTodayDate()
 
               if (dateInput.value !== todayFormatted) {
+                // Первая отправка в пятницу (за вчера) - сохраняем состояние
+                saveFridayState()
+
                 dateInput.value = todayFormatted
                 projects = []
                 addProject() // Очищает и рендерит новый проект
-                document.getElementById('result').textContent =
-                  'Отчет за вчера отправлен. Теперь можно заполнить за пятницу.'
+              } else {
+                // Вторая отправка в пятницу (за сегодня) - очищаем состояние
+                localStorage.removeItem('fridayState')
               }
             }
           })
@@ -697,17 +761,78 @@
           document.getElementById('userName').value
         )
       }
+
+      // Функции для работы с состоянием пятницы
+      function getTodayDate() {
+        return new Date().toISOString().split('T')[0]
+      }
+
+      function isFridayToday() {
+        const today = new Date()
+        return today.getDay() === 5
+      }
+
+      function saveFridayState() {
+        const state = {
+          isFriday: true,
+          date: getTodayDate(),
+          timestamp: new Date().getTime(),
+        }
+        localStorage.setItem('fridayState', JSON.stringify(state))
+      }
+
+      function loadFridayState() {
+        const saved = localStorage.getItem('fridayState')
+        if (!saved) return null
+
+        try {
+          const state = JSON.parse(saved)
+          const today = new Date()
+          const savedDate = new Date(state.timestamp)
+
+          // Проверяем, не прошла ли неделя с момента сохранения
+          const weekInMs = 7 * 24 * 60 * 60 * 1000
+          if (today.getTime() - savedDate.getTime() > weekInMs) {
+            localStorage.removeItem('fridayState')
+            return null
+          }
+
+          return state
+        } catch (e) {
+          localStorage.removeItem('fridayState')
+          return null
+        }
+      }
       document.addEventListener('DOMContentLoaded', function () {
         const nameInput = document.getElementById('userName')
         const dateInput = document.getElementById('workDate')
+
         // Восстановление имени
         const savedName = localStorage.getItem('userName')
         if (savedName) nameInput.value = savedName
 
-        // Установка вчерашней даты
-        const yesterday = new Date()
-        yesterday.setDate(yesterday.getDate() - 1)
-        dateInput.value = yesterday.toISOString().split('T')[0]
+        // Логика установки даты
+        const isFriday = isFridayToday()
+
+        if (isFriday) {
+          // Если сегодня пятница, проверяем сохраненное состояние
+          const fridayState = loadFridayState()
+
+          if (fridayState && fridayState.isFriday) {
+            // Если уже была отправка за вчера, показываем сегодняшнюю дату
+            dateInput.value = getTodayDate()
+          } else {
+            // Если это первая загрузка в пятницу, показываем вчерашнюю дату
+            const yesterday = new Date()
+            yesterday.setDate(yesterday.getDate() - 1)
+            dateInput.value = yesterday.toISOString().split('T')[0]
+          }
+        } else {
+          // Если не пятница, показываем вчерашнюю дату
+          const yesterday = new Date()
+          yesterday.setDate(yesterday.getDate() - 1)
+          dateInput.value = yesterday.toISOString().split('T')[0]
+        }
 
         // Слушатели для автосохранения
         nameInput.addEventListener('input', saveUserNameToLocalStorage)
@@ -716,6 +841,8 @@
       // Инициализация: добавляем первый проект по умолчанию
       window.addEventListener('DOMContentLoaded', () => {
         if (projects.length === 0) addProject()
+        // Обновляем плейсхолдеры при загрузке страницы
+        setTimeout(updateTimePlaceholders, 100)
       })
     </script>
   </body>
