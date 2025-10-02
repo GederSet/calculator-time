@@ -7,312 +7,9 @@
       rel="stylesheet"
       href="https://unpkg.com/easymde/dist/easymde.min.css"
     />
+    <link rel="stylesheet" href="style.css" />
     <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-      :root {
-        --bg-main: #ececf1;
-        --container-bg: #fff;
-        --calculate-bg: #ececf1;
-        --calculate-bg-hover: #e0e0e6;
-        --text-main: #343541;
-        --subtext: #6e6e80;
-        --input-bg: #fff;
-        --project-border: #d9d9e3;
-        --primary: #10a37f;
-        --primary-hover: #0d8a6a;
-        --danger: #ff4d4f;
-        --danger-hover: #d9363e;
-        --input-border: #f7f7fa;
-        --bubble-bg: #f7f7fa;
-        --shadow: 0 4px 32px rgb(35 35 35 / 10%);
-      }
-      body {
-        font-family: 'Segoe UI', Arial, sans-serif;
-        background: var(--bg-main);
-        color: var(--text-main);
-        min-height: 100vh;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-weight: 400;
-      }
-      .container {
-        width: 100%;
-        max-width: 540px;
-        margin: 40px auto 40px auto;
-        background: var(--container-bg);
-        border-radius: 16px;
-        padding: 0 0 16px 0;
-        box-shadow: var(--shadow);
-        display: flex;
-        flex-direction: column;
-      }
-      .title {
-        margin: 0;
-        padding: 32px 32px 0 32px;
-        margin-bottom: 20px;
-        font-size: 2rem;
-        color: var(--text-main);
-        letter-spacing: -1px;
-      }
-      .sub-title {
-        color: var(--text-main);
-        font-size: 18px;
-        margin-bottom: 10px;
-      }
-      form {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        padding: 0 32px;
-      }
-      .form-row {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-bottom: 16px;
-      }
-      .project-input {
-        padding: 10px;
-      }
-      .form-row input,
-      .form-row textarea {
-        padding: 10px 12px;
-        font-size: 16px;
-        border-radius: 8px;
-        border: 1px solid var(--input-border);
-        background: var(--input-bg);
-        color: var(--text-main);
-        transition: background 0.2s, border 0.2s;
-      }
-      .form-row input:focus,
-      .form-row textarea:focus,
-      .project-fields input:focus,
-      .project-fields textarea:focus {
-        border: 1.5px solid var(--primary);
-        outline: none;
-        background: #fff;
-      }
-      .projects-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        margin-bottom: 10px;
-      }
-      .project {
-        background: var(--bubble-bg);
-        border: 1px solid var(--input-border);
-        border-radius: 16px;
-        padding: 16px 18px 20px 18px;
-        margin-bottom: 20px;
-        position: relative;
-      }
-      .project-fields label {
-        display: flex;
-        flex-direction: column;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--subtext);
-        margin-bottom: 2px;
-      }
-      .project-label {
-        font-size: 18px;
-        font-weight: 400;
-        color: var(--text-main);
-        margin-bottom: 10px;
-      }
-      .project-fields input {
-        padding: 12px;
-        font-size: 15px;
-        border-radius: 6px;
-        border: 1px solid var(--input-border);
-        background: var(--input-bg);
-        color: var(--text-main);
-        margin-bottom: 2px;
-        transition: border 0.2s;
-      }
-      .project textarea {
-        outline: none;
-        min-height: 60px;
-        resize: vertical;
-        padding: 12px;
-        font-size: 15px;
-        border-radius: 6px;
-        border: 1px solid var(--input-border);
-        background: var(--input-bg);
-        color: var(--text-main);
-        margin-bottom: 10px;
-        transition: border 0.2s;
-      }
-      .remove-project-btn {
-        background: var(--danger);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 16px;
-        margin-top: 0;
-        margin-bottom: 0;
-        text-align: right;
-        transition: background 0.2s;
-      }
-      .remove-project-btn:hover {
-        background: var(--danger-hover);
-      }
-      .add-project-btn,
-      .calculate-btn,
-      .send-btn {
-        width: 100%;
-        min-width: 120px;
-        padding: 10px 18px;
-        font-size: 16px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-        transition: background 0.2s, color 0.2s;
-      }
-      .add-project-btn {
-        background: var(--primary);
-        color: #fff;
-      }
-      .add-project-btn:hover {
-        background: var(--primary-hover);
-      }
-      .calculate-btn {
-        background: var(--calculate-bg);
-        color: var(--text-main);
-        border: 1px solid var(--input-border);
-      }
-      .calculate-btn:hover {
-        background: var(--calculate-bg-hover);
-      }
-      .send-btn {
-        background: var(--primary);
-        color: #fff;
-      }
-      .send-btn:hover {
-        background: var(--primary-hover);
-      }
-      #result {
-        margin: 16px 0 0 0;
-        font-size: 18px;
-        padding-top: 12px;
-        color: var(--text-main);
-        max-width: 80%;
-        align-self: flex-start;
-        margin-left: 0;
-      }
-      #statusMessage {
-        margin-top: 15px;
-        font-weight: 500;
-        color: var(--primary);
-        font-size: 15px;
-        padding-left: 2px;
-      }
-      .editor-toolbar button {
-        color: var(--text-main);
-      }
-      @media (max-width: 600px) {
-        .container {
-          max-width: 100vw;
-          border-radius: 0;
-          box-shadow: none;
-        }
-        form {
-          padding: 0 8px;
-        }
-        h2 {
-          padding: 24px 8px 0 8px;
-        }
-        #result {
-          max-width: 98%;
-        }
-      }
-      /* Тёмная тема */
-      body.dark-theme {
-        --bg-main: #181a20;
-        --container-bg: #23262f;
-        --calculate-bg: #23262f;
-        --calculate-bg-hover: #17191f;
-        --text-main: #f7f7fa;
-        --subtext: #bdbdbd;
-        --input-bg: #23262f;
-        --input-border: #393b41;
-        --primary: #10a37f;
-        --primary-hover: #0d8a6a;
-        --danger: #ff4d4f;
-        --danger-hover: #d9363e;
-        --input-border: #393b41;
-        --bubble-bg: #23262f;
-        --shadow: 0 4px 32px rgb(0 0 0 / 40%);
-      }
-      @media (prefers-color-scheme: dark) {
-        body:not(.light-theme) {
-          --bg-main: #181a20;
-          --container-bg: #23262f;
-          --calculate-bg: #23262f;
-          --calculate-bg-hover: #17191f;
-          --text-main: #f7f7fa;
-          --subtext: #bdbdbd;
-          --input-bg: #23262f;
-          --input-border: #393b41;
-          --primary: #10a37f;
-          --primary-hover: #0d8a6a;
-          --danger: #ff4d4f;
-          --danger-hover: #d9363e;
-          --input-border: #393b41;
-          --bubble-bg: #23262f;
-          --shadow: 0 4px 32px rgb(0 0 0 / 40%);
-        }
-      }
-      body.dark-theme .form-row input,
-      body.dark-theme .form-row textarea,
-      body.dark-theme .project .project-fields input,
-      body.dark-theme .project textarea {
-        background: var(--input-bg);
-      }
-      body.dark-theme .form-row input:focus,
-      body.dark-theme .form-row textarea:focus,
-      body.dark-theme .project .project-fields input:focus,
-      body.dark-theme .project textarea:focus {
-        background: var(--container-bg);
-      }
-      body.dark-theme input[type='date'] {
-        background: var(--input-bg);
-      }
-      body.dark-theme input[type='date']:focus {
-        background: var(--container-bg);
-      }
-      .theme-toggle-btn {
-        position: absolute;
-        top: 18px;
-        right: 24px;
-        z-index: 10;
-        background: none;
-        border: none;
-        color: var(--text-main);
-        font-size: 22px;
-        cursor: pointer;
-        padding: 4px 8px;
-        border-radius: 6px;
-        transition: background 0.2s;
-      }
-      .theme-toggle-btn:hover {
-        background: var(--input-bg);
-      }
-    </style>
   </head>
   <body>
     <script type="text/javascript">
@@ -388,16 +85,47 @@
       <form id="timeForm" autocomplete="off" onsubmit="return false;">
         <div class="form-row">
           <label class="sub-title" for="userName">Имя и фамилия:</label>
-          <input type="text" id="userName" required placeholder="Иван Иванов" />
+          <div class="select" id="employeeSelect">
+            <div class="select__rows">
+              <input
+                class="project-input select__input"
+                type="text"
+                id="userName"
+                placeholder="Выберите сотрудника"
+              />
+              <div class="select__arrow-body">
+                <svg class="select__svg" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    class="select_arrow"
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M2.33563 8.74741L3.66436 7.25259L12 14.662L20.3356 7.25259L21.6644 8.74741L12 17.338L2.33563 8.74741Z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="select__body">
+              <div class="select__items">
+                <!-- Сотрудники будут загружены динамически -->
+              </div>
+            </div>
+          </div>
         </div>
         <div class="form-row">
           <label class="sub-title" for="workDate">Дата:</label>
-          <input type="date" id="workDate" required />
+          <input
+            class="project-date-input"
+            type="date"
+            id="workDate"
+            required
+          />
         </div>
         <div class="sub-title" style="margin-bottom: 10px; font-size: 18px">
           Проекты:
         </div>
-        <div id="projectsList" class="projects-list"></div>
+        <div id="projectsList" class="projects-list">
+          <!-- Проекты будут добавляться динамически -->
+        </div>
         <button type="button" class="add-project-btn" onclick="addProject()">
           Добавить проект
         </button>
@@ -417,14 +145,107 @@
         <div id="statusMessage"></div>
       </form>
     </div>
-
     <script>
+      let allProjects = []
+      let allEmployees = []
       let projects = []
       let projectId = 0
+      const MAX_DISPLAYED_PROJECTS = 6
+      const MAX_DISPLAYED_EMPLOYEES = 5
+
+      async function loadAllProjects() {
+        try {
+          const response = await fetch(
+            'https://script.google.com/macros/s/AKfycbxDnEgSVlNGXMRQWVWdDSwHAqytJcp09i6wuPGU6-Vzx22qkzXrSV5dP2FW3bTBBSMIUw/exec'
+          )
+          const data = await response.json()
+          allProjects = data.projects || []
+          allEmployees = data.employees || []
+          console.log('Проекты:', allProjects)
+          console.log('Сотрудники:', allEmployees)
+
+          // Обновляем селект сотрудников
+          updateEmployeeSelect()
+
+          // Обновляем все селекты проектов после загрузки
+          document
+            .querySelectorAll('.select:not(#employeeSelect)')
+            .forEach((select) => {
+              const inputValue = select.querySelector('.select__input').value
+              updateSelectItems(select, inputValue)
+            })
+        } catch (e) {
+          console.error('Ошибка при загрузке данных:', e)
+          allProjects = []
+          allEmployees = []
+        }
+      }
+
+      // Функция для обновления селекта сотрудников
+      function updateEmployeeSelect(filter = '') {
+        const employeeSelect = document.getElementById('employeeSelect')
+        if (!employeeSelect) {
+          console.log('Селект сотрудников не найден')
+          return
+        }
+
+        const itemsContainer = employeeSelect.querySelector('.select__items')
+        if (!itemsContainer) {
+          console.log('Контейнер элементов не найден')
+          return
+        }
+
+        console.log(
+          'Обновляем селект сотрудников, количество:',
+          allEmployees.length,
+          'фильтр:',
+          filter
+        )
+
+        if (allEmployees.length > 0) {
+          // Фильтруем сотрудников по поисковому запросу
+          const filteredEmployees = allEmployees.filter((employee) =>
+            employee.toLowerCase().includes(filter.toLowerCase())
+          )
+
+          // Берем первые MAX_DISPLAYED_EMPLOYEES результатов
+          const displayEmployees = filteredEmployees.slice(
+            0,
+            MAX_DISPLAYED_EMPLOYEES
+          )
+
+          if (displayEmployees.length > 0) {
+            const html = displayEmployees
+              .map((employee) => `<div class="select__item">${employee}</div>`)
+              .join('')
+            itemsContainer.innerHTML = html
+            console.log(
+              'Отфильтрованные сотрудники добавлены в селект:',
+              displayEmployees.length,
+              'из',
+              filteredEmployees.length
+            )
+          } else {
+            itemsContainer.innerHTML =
+              '<div class="select__not-found">Не найдено</div>'
+            console.log('Сотрудники не найдены по фильтру')
+          }
+        } else {
+          itemsContainer.innerHTML =
+            '<div class="select__loading">Загрузка сотрудников...</div>'
+          console.log('Показываем загрузку сотрудников')
+        }
+      }
 
       function addProject() {
         const id = ++projectId
-        projects.push({ id, name: '', time: '', comment: '' })
+        projects.push({
+          id,
+          name: '',
+          time: '',
+          comment: '',
+          is_internal: false,
+        })
         renderProjects()
         // Обновляем плейсхолдеры после добавления проекта
         updateTimePlaceholders()
@@ -505,7 +326,7 @@
         })
       }
 
-      function renderProjects() {
+      async function renderProjects() {
         const list = document.getElementById('projectsList')
         list.innerHTML = ''
         projects.forEach((proj) => {
@@ -515,16 +336,74 @@
             <div class="project-fields">
               <label>
                 <p class="project-label">Название проекта</p>
-                <input name="project-name" type="text" placeholder="Название проекта" value="${proj.name.replace(
-                  /"/g,
-                  '&quot;'
-                )}" onchange="updateProjectField(${
-            proj.id
-          }, 'name', this.value)" required />
+                <div class="select" data-project-id="${proj.id}">
+                  <div class="select__rows">
+                    <input
+                      class="project-input select__input"
+                      name="project-name"
+                      type="text"
+                      placeholder="Название проекта"
+                      value="${proj.name.replace(/"/g, '&quot;')}"
+                    />
+                    <div class="select__arrow-body">
+                      <svg
+                        class="select__svg"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          class="select_arrow"
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                          d="M2.33563 8.74741L3.66436 7.25259L12 14.662L20.3356 7.25259L21.6644 8.74741L12 17.338L2.33563 8.74741Z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="select__body">
+                    <div class="select__items" style="font-size: 16px">
+                      ${
+                        allProjects.length > 0
+                          ? allProjects
+                              .slice(0, MAX_DISPLAYED_PROJECTS)
+                              .map(
+                                (p) => `<div class="select__item">${p}</div>`
+                              )
+                              .join('')
+                          : '<div class="select__loading">Загрузка проектов...</div>'
+                      }
+                    </div>
+                  </div>
+                </div>
+              </label>
+              <label class="project__checkbox-label">
+                <p class="project-label">Внутрянка</p>
+                <input
+                  class="project__checkbox"
+                  type="checkbox"
+                  name="project-internal"
+                  ${proj.is_internal ? 'checked' : ''}
+                  onchange="updateProjectField(${
+                    proj.id
+                  }, 'is_internal', this.checked)"
+                />
+                <span class="project__icon-wrapper">
+                  <svg
+                    class="project__internal-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14px"
+                    height="14px"
+                    viewBox="0 0 1920 1920"
+                  >
+                    <path
+                      d="M1827.701 303.065 698.835 1431.801 92.299 825.266 0 917.564 698.835 1616.4 1919.869 395.234z"
+                      fill-rule="evenodd"
+                    />
+                  </svg>
+                </span>
               </label>
               <label>
                 <p class="project-label">Время (например, 1ч 40м)</p>
-                <input name="project-time" type="text" placeholder="Время" value="${proj.time.replace(
+                <input class="project-input" name="project-time" type="text" placeholder="Время" value="${proj.time.replace(
                   /"/g,
                   '&quot;'
                 )}" oninput="updateProjectField(${
@@ -549,6 +428,204 @@
         })
         // Обновляем плейсхолдеры после рендеринга
         updateTimePlaceholders()
+        // Инициализируем селекты
+        initializeSelects()
+      }
+
+      // Функция для обновления списка проектов в селекте
+      function updateSelectItems(select, filter = '') {
+        const itemsContainer = select.querySelector('.select__items')
+        const wasActive = select.classList.contains('select_active')
+
+        // Фильтруем проекты по поисковому запросу
+        const filteredProjects = allProjects.filter((project) =>
+          project.toLowerCase().includes(filter.toLowerCase())
+        )
+
+        // Берем первые MAX_DISPLAYED_PROJECTS результатов
+        const displayProjects = filteredProjects.slice(
+          0,
+          MAX_DISPLAYED_PROJECTS
+        )
+
+        // Создаем HTML для элементов
+        let html = ''
+
+        if (allProjects.length === 0) {
+          html = '<div class="select__loading">Загрузка проектов...</div>'
+        } else if (displayProjects.length === 0) {
+          if (filter === '') {
+            // Если нет фильтра, но нет проектов для отображения, показываем сообщение
+            html = '<div class="select__not-found">Проекты не найдены</div>'
+          } else {
+            // Если есть фильтр, но ничего не найдено
+            html = '<div class="select__not-found">Не найдено</div>'
+          }
+        } else {
+          html = displayProjects
+            .map((p) => `<div class="select__item">${p}</div>`)
+            .join('')
+        }
+
+        // Обновляем содержимое
+        itemsContainer.innerHTML = html
+
+        // Восстанавливаем состояние открытости, если селект был открыт
+        if (wasActive) {
+          select.classList.add('select_active')
+          // Добавляем небольшую задержку для плавного обновления
+          setTimeout(() => {
+            if (select.classList.contains('select_active')) {
+              select.classList.add('select_active')
+            }
+          }, 10)
+        }
+
+        // Переприсваиваем обработчики для новых элементов
+        bindSelectItemEvents(select)
+      }
+
+      // Функция для привязки обработчиков к элементам селекта (теперь не нужна, используется делегирование)
+      function bindSelectItemEvents(select) {
+        // Обработчики теперь привязаны через делегирование событий в initializeSelects()
+        // Эта функция оставлена для совместимости, но не выполняет никаких действий
+      }
+
+      // Функция для инициализации селектов
+      function initializeSelects() {
+        // Объединенный обработчик для всех кликов по селекту
+        document.addEventListener('click', (e) => {
+          // Проверяем, что клик по селекту
+          if (e.target.closest('.select')) {
+            const select = e.target.closest('.select')
+            const isArrow = e.target.closest('.select__arrow-body')
+            const isInput = e.target.classList.contains('select__input')
+
+            console.log(
+              'Клик по селекту, стрелка:',
+              !!isArrow,
+              'инпут:',
+              isInput
+            )
+
+            // Закрываем все другие селекты
+            document.querySelectorAll('.select').forEach((s) => {
+              if (s !== select) {
+                s.classList.remove('select_active')
+              }
+            })
+
+            // Если клик по стрелке - переключаем селект
+            if (isArrow) {
+              e.stopPropagation() // Останавливаем всплытие события
+              const isActive = select.classList.contains('select_active')
+              console.log('Состояние селекта до переключения:', isActive)
+
+              if (isActive) {
+                select.classList.remove('select_active')
+                console.log('Селект закрыт стрелкой')
+                console.log(
+                  'Класс после удаления:',
+                  select.classList.contains('select_active')
+                )
+              } else {
+                select.classList.add('select_active')
+                console.log('Селект открыт стрелкой')
+                console.log(
+                  'Класс после добавления:',
+                  select.classList.contains('select_active')
+                )
+              }
+            }
+            // Если клик по инпуту - только открываем
+            else if (isInput) {
+              select.classList.add('select_active')
+              console.log('Селект открыт инпутом')
+            }
+          }
+        })
+
+        // Привязываем обработчики к элементам селектов
+        document.querySelectorAll('.select').forEach((select) => {
+          bindSelectItemEvents(select)
+        })
+
+        // Инициализируем селект сотрудников
+        updateEmployeeSelect()
+
+        // Обработчик для выбора элемента из селекта (делегирование событий)
+        document.addEventListener('click', (e) => {
+          // Проверяем, что клик по элементу селекта
+          if (e.target.classList.contains('select__item')) {
+            console.log(
+              'Клик по элементу селекта:',
+              e.target.textContent.trim()
+            )
+
+            e.preventDefault()
+            e.stopPropagation()
+
+            const select = e.target.closest('.select')
+            if (!select) {
+              console.log('Селект не найден')
+              return
+            }
+
+            const input = select.querySelector('.select__input')
+            const projectId = parseInt(select.dataset.projectId)
+
+            // Устанавливаем значение в инпут
+            input.value = e.target.textContent.trim()
+
+            // Если это селект сотрудников, сохраняем в localStorage
+            if (select.id === 'employeeSelect') {
+              const selectedEmployee = e.target.textContent.trim()
+              localStorage.setItem('selectedEmployee', selectedEmployee)
+              console.log(
+                'Сотрудник сохранен в localStorage:',
+                selectedEmployee
+              )
+            } else {
+              // Обновляем данные проекта
+              updateProjectField(projectId, 'name', e.target.textContent.trim())
+            }
+
+            // Закрываем селект
+            select.classList.remove('select_active')
+            console.log('Селект закрыт')
+
+            // Убираем фокус с инпута
+            input.blur()
+          }
+        })
+
+        // Фильтрация при вводе
+        document.querySelectorAll('.select__input').forEach((input) => {
+          input.addEventListener('input', (e) => {
+            const select = input.closest('.select')
+            const filter = input.value.toLowerCase()
+
+            // Если это селект сотрудников
+            if (select.id === 'employeeSelect') {
+              updateEmployeeSelect(filter)
+              // Сохраняем введенный текст в localStorage
+              if (input.value.trim()) {
+                localStorage.setItem('selectedEmployee', input.value.trim())
+                console.log('Сотрудник сохранен при вводе:', input.value.trim())
+              }
+            } else {
+              // Если это селект проектов
+              const projectId = parseInt(select.dataset.projectId)
+              // Обновляем значение в проекте
+              updateProjectField(projectId, 'name', input.value)
+              // Обновляем список проектов в этом селекте
+              updateSelectItems(select, filter)
+            }
+
+            // Открываем селект при вводе
+            select.classList.add('select_active')
+          })
+        })
       }
 
       function calculateTotalTime() {
@@ -576,7 +653,7 @@
         const date = document.getElementById('workDate').value
         if (!name || !date || projects.length === 0) {
           alert(
-            'Пожалуйста, заполните все поля и добавьте хотя бы один проект.'
+            'Пожалуйста, выберите сотрудника, дату и добавьте хотя бы один проект.'
           )
           return
         }
@@ -699,6 +776,7 @@
             date: formattedDate,
             time: totalMinutes ? String(totalMinutes) : '',
             comment: proj.comment,
+            is_internal: proj.is_internal ? 'Да' : '',
           }
           fetch(
             'https://n8n-8018645861-7.nocodecloud.ru/webhook/timetracking',
@@ -754,12 +832,11 @@
           : 'green'
       }
 
-      // Автосохранение имени
-      function saveUserNameToLocalStorage() {
-        localStorage.setItem(
-          'userName',
-          document.getElementById('userName').value
-        )
+      // Функция для очистки сохраненного сотрудника
+      function clearSelectedEmployee() {
+        localStorage.removeItem('selectedEmployee')
+        document.getElementById('userName').value = ''
+        console.log('Сохраненный сотрудник очищен')
       }
 
       // Функции для работы с состоянием пятницы
@@ -803,13 +880,17 @@
           return null
         }
       }
-      document.addEventListener('DOMContentLoaded', function () {
+      // Объединенная инициализация
+      document.addEventListener('DOMContentLoaded', async function () {
         const nameInput = document.getElementById('userName')
         const dateInput = document.getElementById('workDate')
 
-        // Восстановление имени
-        const savedName = localStorage.getItem('userName')
-        if (savedName) nameInput.value = savedName
+        // Восстановление выбранного сотрудника
+        const savedEmployee = localStorage.getItem('selectedEmployee')
+        if (savedEmployee) {
+          nameInput.value = savedEmployee
+          console.log('Восстановлен сотрудник из localStorage:', savedEmployee)
+        }
 
         // Логика установки даты
         const isFriday = isFridayToday()
@@ -834,15 +915,40 @@
           dateInput.value = yesterday.toISOString().split('T')[0]
         }
 
-        // Слушатели для автосохранения
-        nameInput.addEventListener('input', saveUserNameToLocalStorage)
-      })
+        // Слушатели для автосохранения (убрано для селекта сотрудников)
+        // nameInput.addEventListener('input', saveUserNameToLocalStorage)
 
-      // Инициализация: добавляем первый проект по умолчанию
-      window.addEventListener('DOMContentLoaded', () => {
-        if (projects.length === 0) addProject()
+        // Глобальный обработчик для закрытия селектов при клике вне них
+        document.addEventListener('click', (e) => {
+          document.querySelectorAll('.select').forEach((select) => {
+            if (!select.contains(e.target)) {
+              select.classList.remove('select_active')
+            }
+          })
+        })
+
+        // Инициализация селекта сотрудников
+        updateEmployeeSelect()
+
+        // Инициализация проектов - сначала показываем первый проект, затем загружаем список
+        if (projects.length === 0) {
+          // Добавляем первый проект сразу (без загрузки списка)
+          addProject()
+
+          // Загружаем список проектов в фоне
+          loadAllProjects().then(() => {
+            // После загрузки обновляем только содержимое селектов, не пересоздавая их
+            document
+              .querySelectorAll('.select:not(#employeeSelect)')
+              .forEach((select) => {
+                const inputValue = select.querySelector('.select__input').value
+                updateSelectItems(select, inputValue)
+              })
+          })
+        }
+
         // Обновляем плейсхолдеры при загрузке страницы
-        setTimeout(updateTimePlaceholders, 100)
+        updateTimePlaceholders()
       })
     </script>
   </body>
